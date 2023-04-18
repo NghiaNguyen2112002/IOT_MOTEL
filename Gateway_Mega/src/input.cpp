@@ -4,7 +4,11 @@ static uint8_t Request_data_pzem[] = {0xF8, 0x04, 0x00, 0x00, 0x00, 0x0A, 0x64, 
 SoftwareSerial pzemSerial(PIN_PZEM_RX, PIN_PZEM_TX);
 PzemData pzemData;
 
-unsigned long pulse_counter;
+uint8_t BUTTON_PIN[NO_OF_BUTTONS] = { PIN_BT0 };
+bool Flag_for_button_press[NO_OF_BUTTONS];
+uint16_t Counter_button_press[NO_OF_BUTTONS];
+
+uint32_t pulse_counter;
 
 void IncreaseFre_ISR(void){
   pulse_counter++;
@@ -31,7 +35,32 @@ void IN_Init(void){
   pulse_counter = 0;
 }
 
-float IN_GetWaterVolume_l(void){
+void IN_ReadButton(void){
+  for (uint8_t i = 0; i < NO_OF_BUTTONS; i++) {
+    if (digitalRead(BUTTON_PIN[i]) == BUTTON_IS_PRESSED) {
+      if (Counter_button_press[i] < MAX_COUNTER) {
+        Counter_button_press[i]++;
+      }
+    } else {
+      Flag_for_button_press[i] = (Counter_button_press[i] > 0) && (Counter_button_press[i] < 10);
+      Counter_button_press[i] = 0;
+    }
+  }
+}
+
+bool IN_IsPressed(uint8_t index){
+  if(index >= NO_OF_BUTTONS) return 0;
+
+  return Flag_for_button_press[index];
+}
+bool IN_IsPressed_ms(uint8_t index, uint16_t duration){
+	if(index >= NO_OF_BUTTONS) return 0;
+
+	//button is read every 50ms -> counter += 1 every 50ms if button is held
+	return Counter_button_press[index] >= (duration / 50);
+}
+
+float IN_GetWaterVolume_l(void){  
   float volume_l = (float)(pulse_counter / 60.0) / FACTOR_K_YF_S201;
   pulse_counter = 0;
   return volume_l;

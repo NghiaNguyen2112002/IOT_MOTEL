@@ -6,6 +6,15 @@
 #include "SoftwareSerial.h"
 #include "pin.h"
 
+
+//==================BUTTON===================//
+#define NO_OF_BUTTONS         1
+#define BUTTON_IS_PRESSED     0
+#define BUTTON_IS_RELEASED    1
+
+#define MAX_COUNTER           1000      //50s
+
+
 //===================YF_S201===================//
 #define FACTOR_K_YF_S201        7.5
 
@@ -48,7 +57,13 @@ typedef struct PzemData{
 }PzemData;
 
 void IN_Init(void);
+
+void IN_ReadButton(void);
+bool IN_IsPressed(uint8_t index);
+bool IN_IsPressed_ms(uint8_t index, uint16_t duration);
+
 float IN_GetWaterVolume_l(void);
+
 float IN_GetVol(void);
 float IN_GetCur(void);
 float IN_GetPow(void);
