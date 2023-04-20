@@ -83,5 +83,10 @@ float IN_GetEner(void){
 
 }
 
-float IN_GetFre(void);
-float IN_GetPF(void);
+float IN_GetFre(void){
+
+}
+
+float IN_GetPF(void){
+  
+}

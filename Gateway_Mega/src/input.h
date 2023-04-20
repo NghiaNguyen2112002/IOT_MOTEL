@@ -14,6 +14,7 @@
 
 #define MAX_COUNTER           1000      //50s
 
+#define BT0                   0
 
 //===================YF_S201===================//
 #define FACTOR_K_YF_S201        7.5

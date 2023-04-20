@@ -3,6 +3,9 @@
 
 #include "input.h"
 #include "pin.h"
+#include "global.h"
+#include "fsm.h"
+#include "uart.h"
 
 #define SERIAL_DEBUG_BAUD       9600
 
@@ -14,19 +17,33 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(SERIAL_DEBUG_BAUD);
   CLCD_Init(0x27, 2, 16);
-  CLCD_ClearBuffer();
-  CLCD_PrintStringBuffer(0, 0, "123");
+  
+  UART_Init(PIN_ESP_TX, PIN_ESP_RX);
+  
   IN_Init();
-
+  FSM_Init();
   time_cur = millis();
+  
+  Serial.println("START");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  // Serial.print(UART_GetMsg());
+  // if(Serial.available()){
+  //   UART_SendMsg(Serial.readString());
+  // }
   if(millis() >= time_cur + EXCECUTING_CYCLE){
     time_cur = millis();
-    // IN_GetVol();
-    // Serial.println(IN_GetWaterVolume_l());
+
+    _counter_time_elapsed = (_counter_time_elapsed + 1) % 200;
+
+    if(_time_screen >= 5) _time_screen -= 5;
+    if(_time_read_data >= 5) _time_read_data -= 5;
+
+    FSM_SystemControl();
+    FSM_LcdDisplay();
+
     CLCD_DisplayScreen();
   }
 }
