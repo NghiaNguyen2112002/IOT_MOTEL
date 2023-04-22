@@ -20,6 +20,36 @@
 #define FACTOR_K_YF_S201        7.5
 
 //===================PZEM 004T 100A V3.0===================//
+#define SCALE_V                 0.1
+#define SCALE_A                 0.001
+#define SCALE_P                 0.1
+#define SCALE_E                 1
+#define SCALE_F                 0.1
+#define SCALE_PF                0.01
+
+
+#define INDEX_PZEM_ADDRR        0
+#define INDEX_PZEM_BYTE_SUCCESS 1
+#define INDEX_PZEM_NUM_B        2
+#define INDEX_PZEM_VOL_H        3
+#define INDEX_PZEM_VOL_L        4
+#define INDEX_PZEM_AMP_H        5
+#define INDEX_PZEM_AMP_L        6
+#define INDEX_PZEM_AMP1_H       7
+#define INDEX_PZEM_AMP1_L       8
+#define INDEX_PZEM_POW_H        9
+#define INDEX_PZEM_POW_L        10
+#define INDEX_PZEM_POW1_H       11
+#define INDEX_PZEM_POW1_L       12
+#define INDEX_PZEM_ENE_H        13
+#define INDEX_PZEM_ENE_L        14
+#define INDEX_PZEM_ENE1_H       15
+#define INDEX_PZEM_ENE1_L       16
+#define INDEX_PZEM_FRE_H        17
+#define INDEX_PZEM_FRE_L        18
+#define INDEX_PZEM_PF_H         19
+#define INDEX_PZEM_PF_L         20
+
 #define REG_VOLTAGE             0x0000
 #define REG_CURRENT_L           0x0001
 #define REG_CURRENT_H           0X0002
@@ -44,6 +74,7 @@
 
 #define RESPONSE_SIZE           32
 #define READ_TIMEOUT            100
+#define TIME_READ_PZEM          2000
 
 #define INVALID_ADDRESS         0x00
 

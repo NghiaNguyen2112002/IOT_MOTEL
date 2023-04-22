@@ -16,8 +16,8 @@
 
 
 //==========CHANNEL===========//
-#define CHANNEL_DATA                             "mango_garden_data"
-#define CHANNEL_COMMAND                          "mango_garden_cmd"
+#define CHANNEL_DATA                             "motel_data"
+#define CHANNEL_COMMAND                          "motel_cmd"
 
 void SV_Init(void);
 void SV_Connect(void);

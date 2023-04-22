@@ -1,7 +1,9 @@
 #include "input.h"
 
 static uint8_t Request_data_pzem[] = {0xF8, 0x04, 0x00, 0x00, 0x00, 0x0A, 0x64, 0x64};
-SoftwareSerial pzemSerial(PIN_PZEM_RX, PIN_PZEM_TX);
+
+uint8_t response_pzem[28];
+uint32_t time_read_pzem = 0;
 PzemData pzemData;
 
 uint8_t BUTTON_PIN[NO_OF_BUTTONS] = { PIN_BT0 };
@@ -16,23 +18,35 @@ void IncreaseFre_ISR(void){
 
 void ReadPzem(void){
   uint8_t timeout;
-  uint8_t response[28];
 
-  pzemSerial.write(Request_data_pzem, sizeof(Request_data_pzem));
+  Serial1.write(Request_data_pzem, sizeof(Request_data_pzem));
 
-  for(timeout = 0; timeout < 100 && !pzemSerial.available(); timeout++);
+  for(timeout = 0; timeout < 100 && !Serial1.available(); timeout++);
 
-  pzemSerial.readBytes(response, 25);
+  Serial1.readBytes(response_pzem, 25);
 
-  // for(int i = 0; i < 25; i++)Serial.print(response[i], HEX); Serial.println(" ");
+  for(int i = 0; i < 25; i++) {
+    Serial.print(response_pzem[i], HEX); Serial.print(" ");
+  }
+  Serial.println("");
+}
+
+bool IsTimeRead(void){
+  if (millis() - time_read_pzem >= TIME_READ_PZEM){
+    time_read_pzem = millis();
+    return true;
+  }
+
+  return false;
 }
 
 //=================HIGH LEVEL FUNCTION=================//
 void IN_Init(void){
   pinMode(PIN_FLOWMETER, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(PIN_FLOWMETER), IncreaseFre_ISR, RISING);
-  pzemSerial.begin(9600);
+  Serial1.begin(9600);
   pulse_counter = 0;
+  time_read_pzem = millis();
 }
 
 void IN_ReadButton(void){
@@ -68,25 +82,40 @@ float IN_GetWaterVolume_l(void){
 
 
 float IN_GetVol(void){
-  // ReadPzem();
+  if(IsTimeRead()) ReadPzem();
+  
+  return (float) ((response_pzem[INDEX_PZEM_VOL_H]<<8 + response_pzem[INDEX_PZEM_VOL_L]) * SCALE_V);
 }
 
 float IN_GetCur(void){
+  if(IsTimeRead()) ReadPzem();
 
+  return (float) (((response_pzem[INDEX_PZEM_AMP1_H]<<8 + response_pzem[INDEX_PZEM_AMP1_L]) << 24)
+                    | (response_pzem[INDEX_PZEM_AMP_H]<<8 + response_pzem[INDEX_PZEM_AMP_L])) * SCALE_A;
 }
 
 float IN_GetPow(void){
+  if(IsTimeRead()) ReadPzem();
 
+  return (float) (((response_pzem[INDEX_PZEM_POW1_H]<<8 + response_pzem[INDEX_PZEM_POW1_L]) << 24)
+                    | (response_pzem[INDEX_PZEM_POW_H]<<8 + response_pzem[INDEX_PZEM_POW_L])) * SCALE_P;
 }
 
 float IN_GetEner(void){
+  if(IsTimeRead()) ReadPzem();
 
+  return (float) (((response_pzem[INDEX_PZEM_ENE1_H]<<8 + response_pzem[INDEX_PZEM_ENE1_L]) << 24)
+                    | (response_pzem[INDEX_PZEM_ENE_H]<<8 + response_pzem[INDEX_PZEM_ENE_L])) * SCALE_E;
 }
 
 float IN_GetFre(void){
+  if(IsTimeRead()) ReadPzem();
 
+  return (float) ((response_pzem[INDEX_PZEM_FRE_H]<<8 + response_pzem[INDEX_PZEM_FRE_L]) * SCALE_F);
 }
 
 float IN_GetPF(void){
-  
+  if(IsTimeRead()) ReadPzem();
+
+  return (float) ((response_pzem[INDEX_PZEM_PF_H]<<8 + response_pzem[INDEX_PZEM_PF_L]) * SCALE_PF);
 }

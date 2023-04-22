@@ -4,13 +4,23 @@ uint8_t mode_lcd, mode_sys;
 
 
 void ReadData(void){
-    // _Data.current = IN_GetCur();
-    // _Data.energy = IN_GetEner();
-    // _Data.frequency = IN_GetFre();
-    // _Data.pf = IN_GetPF();
-    // _Data.power = IN_GetPow();
-    // _Data.vol = IN_GetVol();
-    // _Data.water_volume = IN_GetWaterVolume_l();
+    _Data.current = IN_GetCur();
+    _Data.energy = IN_GetEner();
+    _Data.frequency = IN_GetFre();
+    _Data.pf = IN_GetPF();
+    _Data.power = IN_GetPow();
+    _Data.vol = IN_GetVol();
+    _Data.water_volume = IN_GetWaterVolume_l();
+
+    Serial.print("CURRENT: "); Serial.println(_Data.current);
+    Serial.print("ENERGY: "); Serial.println(_Data.energy);
+    Serial.print("FREQUENCY: "); Serial.println(_Data.frequency);
+    Serial.print("PF: "); Serial.println(_Data.pf);
+    Serial.print("POWER: "); Serial.println(_Data.power);
+    Serial.print("VOL: "); Serial.println(_Data.vol);
+    Serial.print("WATER: "); Serial.println(_Data.water_volume);
+
+
 }
 
 String ConvertDataToJSONString(void){
@@ -20,6 +30,8 @@ String ConvertDataToJSONString(void){
     str += ",\"WATER\":";
     str += String(_Data.water_volume);
     str += "}";
+
+    return str;
 }
 
 uint8_t ModeSys(void){
@@ -29,7 +41,7 @@ uint8_t ModeSys(void){
 //===========================HIGH LEVEL FUNCTION===========================//
 void FSM_Init(void){
     mode_lcd = INIT;
-    mode_sys = INIT;
+    mode_sys = SYS_PROCESS_DATA;
     _time_screen = 50;
 }
 
@@ -161,6 +173,7 @@ void FSM_SystemControl(void){
     case SYS_CONNECT_WF:
         if(UART_GetMsg() == CONNECT_WF_SUCCESS){
             UART_SendMsg(CMD_TRANSMIT);
+            _time_read_data = TIME_READ_DATA;
             mode_sys = SYS_PROCESS_DATA;
         }
         else if(IN_IsPressed_ms(BT0, 2000)){
@@ -170,6 +183,7 @@ void FSM_SystemControl(void){
         break;
     case SYS_PROCESS_DATA:
         if(_time_read_data < 5){
+            _time_read_data = TIME_READ_DATA;
             ReadData();
             UART_SendMsg(ConvertDataToJSONString());
         }

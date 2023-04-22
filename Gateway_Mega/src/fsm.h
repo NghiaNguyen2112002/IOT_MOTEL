@@ -26,7 +26,7 @@
 
 //==================TIME==================//
 #define TIME_SCREEN						500                 //5000 ms
-#define TIME_READ_DATA					1000                //10 000ms
+#define TIME_READ_DATA					500                //10 000ms
 
 //==================MSG FROM ESP==================//
 #define CONFIG_WF_SUCCESS				"CONFIG_SUCCESS"

@@ -16,6 +16,7 @@ unsigned long time_cur = 0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(SERIAL_DEBUG_BAUD);
+  Serial1.begin(9600);
   CLCD_Init(0x27, 2, 16);
   
   UART_Init(PIN_ESP_TX, PIN_ESP_RX);
@@ -29,10 +30,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // Serial.print(UART_GetMsg());
-  // if(Serial.available()){
-  //   UART_SendMsg(Serial.readString());
-  // }
+
   if(millis() >= time_cur + EXCECUTING_CYCLE){
     time_cur = millis();
 
